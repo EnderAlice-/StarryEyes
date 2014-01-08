@@ -408,7 +408,7 @@ namespace StarryEyes.ViewModels
                 var path = Setting.BackgroundImagePath.Value;
                 if (String.IsNullOrEmpty(path))
                 {
-                    return null;
+                    return new Uri("/blank.png", UriKind.Relative);
                 }
                 if (!Path.IsPathRooted(path))
                 {
@@ -418,7 +418,7 @@ namespace StarryEyes.ViewModels
                 {
                     return new Uri(path, UriKind.Absolute);
                 }
-                return null;
+				return new Uri("/blank.png", UriKind.Relative);
             }
         }
 
