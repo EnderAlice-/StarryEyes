@@ -19,7 +19,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public VersionInfoViewModel()
         {
             // when update is available, callback this.
-            AutoUpdateService.UpdateStateChanged += () => _isUpdateAvailable = true;
+            //AutoUpdateService.UpdateStateChanged += () => _isUpdateAvailable = true;
             Observable.Timer(TimeSpan.FromSeconds(0), TimeSpan.FromHours(8))
                       .Subscribe(_ => UpdateContributors());
         }
@@ -131,11 +131,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return !_isChecking && _isUpdateAvailable; }
         }
 
-        public async void CheckUpdates()
+        public /*async*/ void CheckUpdates()
         {
             _isChecking = true;
             this.RefreshCheckState();
-            _isUpdateAvailable = await AutoUpdateService.CheckPrepareUpdate(App.Version);
+            _isUpdateAvailable = false; // await AutoUpdateService.CheckPrepareUpdate(App.Version);
             _isChecking = false;
             this.RefreshCheckState();
         }
@@ -149,7 +149,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void StartUpdate()
         {
-            AutoUpdateService.StartUpdate(App.Version);
+            //AutoUpdateService.StartUpdate(App.Version);
         }
 
         #endregion

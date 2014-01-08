@@ -15,9 +15,9 @@ namespace StarryEyes.Views.Dialogs
             this.Loaded += AwaitDownloadingUpdateWindow_Loaded;
         }
 
-        async void AwaitDownloadingUpdateWindow_Loaded(object sender, RoutedEventArgs e)
+        /*async*/ void AwaitDownloadingUpdateWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!await AutoUpdateService.CheckPrepareUpdate(null))
+            /*if (!await AutoUpdateService.CheckPrepareUpdate(null))
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
@@ -30,7 +30,7 @@ namespace StarryEyes.Views.Dialogs
                 this.Close();
                 return;
             }
-            AutoUpdateService.StartUpdate(null);
+            AutoUpdateService.StartUpdate(null);*/
             this.Close();
         }
     }
