@@ -133,12 +133,12 @@ namespace StarryEyes
             AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
 
             #region clean up update binary
-            if (e.Args.Select(a => a.ToLower()).Contains("-postupdate"))
+/*            if (e.Args.Select(a => a.ToLower()).Contains("-postupdate"))
             {
                 // remove kup.exe
                 AutoUpdateService.PostUpdate();
             }
-
+*/
             #endregion
 
             #region check and show pre-execute dialog
@@ -216,7 +216,7 @@ namespace StarryEyes
             }
 
             #region Execute update
-
+/*
             // requires settings
             if (AutoUpdateService.IsUpdateBinaryExisted())
             {
@@ -224,7 +224,7 @@ namespace StarryEyes
                 AutoUpdateService.StartUpdate(App.Version);
                 Environment.Exit(0);
             }
-
+*/
             #endregion
 
             // set parameters for accessing twitter.
@@ -264,7 +264,7 @@ namespace StarryEyes
             MuteBlockManager.Initialize();
             StatusBroadcaster.Initialize();
             StatusInbox.Initialize();
-            AutoUpdateService.StartSchedule();
+            //AutoUpdateService.StartSchedule();
 
             // activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
