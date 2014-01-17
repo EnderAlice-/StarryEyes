@@ -68,7 +68,7 @@ namespace StarryEyes.Views.Controls
 
         public SuggestableTextBox()
         {
-            _candidateList = new ListBox { Background = Brushes.White };
+            _candidateList = new ListBox { Background = Brushes.SteelBlue };
             _suggestListPopup = new Popup
             {
                 IsOpen = false,
