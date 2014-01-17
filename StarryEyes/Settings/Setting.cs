@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Windows;
 using System.Xaml;
 using StarryEyes.Albireo;
@@ -166,7 +167,7 @@ namespace StarryEyes.Settings
                     new SettingItemStruct<bool>("AcceptUnstableVersion", App.IsUnstableVersion);
 
         public static readonly SettingItem<string> UserAgent =
-            new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
+            new SettingItem<string>("UserAgent", null);
 
         #region Web proxy configuration
 
@@ -242,8 +243,12 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<int> SettingVersion =
             new SettingItemStruct<int>("SettingVersion", 1);
 
-        public static readonly SettingItemStruct<bool> DatabaseErrorOccured =
-            new SettingItemStruct<bool>("DatabaseErrorOccured", false);
+        #endregion
+
+        #region Easter egg
+
+        public static readonly SettingItemStruct<bool> RotateWindowContent =
+            new SettingItemStruct<bool>("RotateWindowContent", false);
 
         #endregion
 
@@ -324,27 +329,50 @@ namespace StarryEyes.Settings
             public event Action<FilterExpressionBase> ValueChanged;
         }
 
-        public class SettingItem<T> where T : class
+        public abstract class SettingItemBase<T>
+        {
+            private readonly string _name;
+
+            public SettingItemBase(string name)
+            {
+                this._name = name;
+            }
+
+            public string Name { get { return _name; } }
+
+            public abstract T Value { get; set; }
+
+            public event Action<T> ValueChanged;
+
+            protected void RaiseValueChanged(T value)
+            {
+                ValueChanged.SafeInvoke(value);
+            }
+
+            public IDisposable ListenValueChanged(Action<T> listener)
+            {
+                return Observable.FromEvent<T>(
+                    h => ValueChanged += h,
+                    h => ValueChanged -= h)
+                                 .Subscribe(listener);
+            }
+        }
+
+        public class SettingItem<T> : SettingItemBase<T> where T : class
         {
             private readonly bool _autoSave;
             private readonly T _defaultValue;
-            private readonly string _name;
 
             private T _valueCache;
 
             public SettingItem(string name, T defaultValue, bool autoSave = true)
+                : base(name)
             {
-                _name = name;
                 _defaultValue = defaultValue;
                 _autoSave = autoSave;
             }
 
-            public string Name
-            {
-                get { return _name; }
-            }
-
-            public T Value
+            public override T Value
             {
                 get
                 {
@@ -365,34 +393,26 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    this.ValueChanged.SafeInvoke(value);
+                    RaiseValueChanged(value);
                 }
             }
-
-            public event Action<T> ValueChanged;
         }
 
-        public class SettingItemStruct<T> where T : struct
+        public class SettingItemStruct<T> : SettingItemBase<T> where T : struct
         {
             private readonly bool _autoSave;
             private readonly T _defaultValue;
-            private readonly string _name;
 
             private T? _valueCache;
 
             public SettingItemStruct(string name, T defaultValue, bool autoSave = true)
+                : base(name)
             {
-                _name = name;
                 _defaultValue = defaultValue;
                 _autoSave = autoSave;
             }
 
-            public string Name
-            {
-                get { return _name; }
-            }
-
-            public T Value
+            public override T Value
             {
                 get
                 {
@@ -410,11 +430,9 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    this.ValueChanged.SafeInvoke(value);
+                    RaiseValueChanged(value);
                 }
             }
-
-            public event Action<T> ValueChanged;
         }
 
         #endregion
@@ -501,6 +519,8 @@ namespace StarryEyes.Settings
 
         public static void Save()
         {
+            // save before load cause loss the setting!
+            if (!IsLoaded) return;
             lock (_settingValueHolder)
             {
                 try
